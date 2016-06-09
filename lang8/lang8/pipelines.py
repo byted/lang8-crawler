@@ -31,7 +31,7 @@ class Lang8Pipeline(object):
 		self.filename = fileName
 		file = codecs.open(self.output_directory + self.filename, 'wb', encoding="utf-8")
 		self.file_handle[fileName] = file
-		self.data[fileName] = file
+		self.data[fileName] = []
 
 
 	def process_item(self, item, spider):
@@ -60,5 +60,5 @@ class Lang8Pipeline(object):
 
 	def spider_closed(self, spider):
 		for file_name, fileH in self.file_handle.iteritems():
-			fileH.write(json.dumps(self.data[file_name]))
+			fileH.write(json.dumps(self.data[file_name], indent=4))
 			fileH.close()
