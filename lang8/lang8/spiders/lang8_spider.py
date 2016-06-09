@@ -43,9 +43,7 @@ class Lang8Spider(CrawlSpider):
 						 r"<span class=\"sline\">(.*?)</span>",
 						 r"<span class=\"f_gray\">(.*?)</span>"
 						]
-		COMPILED_RE=[]
-		for one in to_be_compile:
-			COMPILED_RE.append(re.compile(one))
+		COMPILED_RE=[re.compile(r) for r in to_be_compile]
 		TAG_RE = re.compile(r"<.*?>")
 
 		item['correction']=[]
@@ -58,7 +56,8 @@ class Lang8Spider(CrawlSpider):
 				incorrect = co.xpath('.//li[@class="incorrect"]/text()').extract()[0].encode("utf-8")
 				correct = correct_xpath.xpath('.//p[1]').extract()[0].encode("utf-8")
 #				self.log("type of correct=%s" % type(correct))
-				for one in COMPILED_RE:
+				correct = re.sub(COMPILED_RE[0], r'\1', correct)
+				for one in COMPILED_RE[1:]:
 					correct = re.sub(one, "", correct)
 				correct = re.sub(TAG_RE, "", correct)
 				#self.log("correct=%s incorrect=%s" % (correct, incorrect))
