@@ -34,5 +34,5 @@ HTTP_PROXY = 'http://127.0.0.1:8123'
 DOWNLOADER_MIDDLEWARES = {
 		'lang8.middlewares.RandomUserAgentMiddleware': 400,
 		'lang8.middlewares.ProxyMiddleware': 410,
-		'scrapy.contrib.downloadermiddleware.useragent.UserAgentMiddleware': None,
+		'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
 }
