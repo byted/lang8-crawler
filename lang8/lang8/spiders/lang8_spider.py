@@ -27,10 +27,12 @@ class Lang8Spider(CrawlSpider):
 										callback=self.logged_in)
 
 	def logged_in(self, response):
-		#yield scrapy.Request("http://lang-8.com/88284/journals")
-		for i in range(1, 10000, 1):
-			scrapying_url = "http://lang-8.com/" + str(i) + "/journals"
-			yield scrapy.Request(scrapying_url)
+		#yield scrapy.Request("http://lang-8.com/371524/journals")
+		for i, n in [[637516, 12]]: #[]: #[[371524, 24], [1317410, 5], [1109291, 10], [1278026, 6], [1555959, 3], [1366015, 12], [1400572, 4], [1197220, 6], [1150683, 3], [1591975, 2], [1560654, 3], [164298, 7]]
+			for j in range(8, n, 1):
+				self.log(str(i) + ", " + str(j))
+				scrapying_url = "http://lang-8.com/" + str(i) + "/journals?page=" + str(j)
+				yield scrapy.Request(scrapying_url)
 
 	def parse_item(self, response):
 		self.log('parsing %s' % response.url)
