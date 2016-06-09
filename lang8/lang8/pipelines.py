@@ -16,6 +16,7 @@ class Lang8Pipeline(object):
 		self.output_directory = 'output2'
 		self.filename = ''
 		self.file_handle = {}
+		self.data = {}
 
 	@classmethod
 	def from_crawler(cls, crawler):
@@ -29,8 +30,8 @@ class Lang8Pipeline(object):
 			os.makedirs(self.output_directory)
 		self.filename = fileName
 		file = codecs.open(self.output_directory + self.filename, 'wb', encoding="utf-8")
-		file.write(u"[")
-		self.file_handle[fileName]=file
+		self.file_handle[fileName] = file
+		self.data[fileName] = file
 
 
 	def process_item(self, item, spider):
@@ -51,11 +52,13 @@ class Lang8Pipeline(object):
 			self.filename = self.curFileName
 		if self.filename != self.curFileName and not self.file_handle.get(self.curFileName):
 			self.spider_opened(spider, self.curFileName)
-		line = json.dumps(dict(item)) + ",\n"
-		self.file_handle[self.curFileName].write(line.decode("unicode_escape"))
+
+		if self.curFileName not in self.data:
+			self.data[self.curFileName] = []
+		self.data[self.curFileName].append(dict(item))
 		return item
 
 	def spider_closed(self, spider):
-		for fileH in self.file_handle.itervalues():
-			fileH.write(u"]")
+		for file_name, fileH in self.file_handle.iteritems():
+			fileH.write(json.dumps(self.data[file_name]))
 			fileH.close()
