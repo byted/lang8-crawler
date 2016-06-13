@@ -1,6 +1,10 @@
 #Lang8 Crawler
-##Overview
 
+##TL;DR
+run for specific users: `scrapy crawl lang8 -a user_ids=list,of,userids,comma,seperated`
+
+
+##Overview
 Lang8 Crawler written in Python is based on scrapy, a fast high-level web crawling and web scraping framework. For more information about scrapy, check the homepage at: http://scrapy.org/
 
 ####The following features included
