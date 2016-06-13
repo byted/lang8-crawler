@@ -62,9 +62,13 @@ class Lang8Pipeline(object):
 		if self.curFileName not in self.data:
 			self.data[self.curFileName] = []
 		self.data[self.curFileName].append(dict(item))
+
+		# always write directly to file so we have running output
+		self.file_handle[self.curFileName].seek(0)
+		self.file_handle[self.curFileName].truncate()
+		self.file_handle[self.curFileName].write(json.dumps(self.data[self.curFileName], indent=4))
 		return item
 
 	def spider_closed(self, spider):
-		for file_name, fileH in self.file_handle.iteritems():
-			fileH.write(json.dumps(self.data[file_name], indent=4))
+		for fileH in self.file_handle.itervalues():
 			fileH.close()
