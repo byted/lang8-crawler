@@ -11,10 +11,17 @@ from lang8.items import Lang8Item, CorrectionItem
 class Lang8Spider(CrawlSpider):
 	name 		= "lang8"
 	allowed_domains	= ["lang-8.com"]
-	scrapying_url = "http://lang-8.com/88284/journals"
+	url_template = "http://lang-8.com/{user_id}/journals"
 	rules = (
-			Rule(LinkExtractor(allow=("\d+/journals/\d+",)), callback='parse_item'),
+			Rule(LinkExtractor(allow=("\d+/journals\?page=\d+",))),
+			Rule(LinkExtractor(allow=("\d+/journals/\d+",)), callback='parse_item')
 	)
+
+	def __init__(self, user_ids, *args, **kwargs):
+		super(Lang8Spider, self).__init__(*args, **kwargs)
+		user_ids = user_ids.split(',')
+		self.start_urls = [self.url_template.format(user_id=uid) for uid in user_ids]
+
 	def start_requests(self):
 		yield scrapy.Request('https://lang-8.com/login', callback=self.login)
 
@@ -27,12 +34,8 @@ class Lang8Spider(CrawlSpider):
 										callback=self.logged_in)
 
 	def logged_in(self, response):
-		#yield scrapy.Request("http://lang-8.com/371524/journals")
-		for i, n in [[637516, 12]]: #[]: #[[371524, 24], [1317410, 5], [1109291, 10], [1278026, 6], [1555959, 3], [1366015, 12], [1400572, 4], [1197220, 6], [1150683, 3], [1591975, 2], [1560654, 3], [164298, 7]]
-			for j in xrange(8, n):
-				self.log(str(i) + ", " + str(j))
-				scrapying_url = "http://lang-8.com/" + str(i) + "/journals?page=" + str(j)
-				yield scrapy.Request(scrapying_url)
+		for url in self.start_urls:
+			yield scrapy.Request(url)
 
 	def parse_item(self, response):
 		self.log('parsing %s' % response.url)
@@ -55,12 +58,12 @@ class Lang8Spider(CrawlSpider):
 					continue
 				incorrect = co.xpath('.//li[@class="incorrect"]/text()').extract()[0].encode("utf-8")
 				correct = correct_xpath.xpath('.//p[1]').extract()[0].encode("utf-8")
-#				self.log("type of correct=%s" % type(correct))
+				# self.log("type of correct=%s" % type(correct))
 				correct = re.sub(COMPILED_RE[0], r'\1', correct)
 				for one in COMPILED_RE[1:]:
 					correct = re.sub(one, "", correct)
 				correct = re.sub(TAG_RE, "", correct)
-				#self.log("correct=%s incorrect=%s" % (correct, incorrect))
+				# self.log("correct=%s incorrect=%s" % (correct, incorrect))
 				co_item = CorrectionItem()
 				co_item['correct'] = correct
 				co_item['incorrect'] = incorrect
@@ -70,6 +73,6 @@ class Lang8Spider(CrawlSpider):
 			main = main_list[0]
 			main = re.sub(TAG_RE, "", main)
 			item['main'] = main
-			#self.log("main=%s" % main)
+			# self.log("main=%s" % main)
 		return item
 
